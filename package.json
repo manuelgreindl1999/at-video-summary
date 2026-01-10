@@ -1,0 +1,24 @@
+{
+  "name": "at-video-summary",
+  "version": "1.0.0",
+  "description": "Web tool for automatic video screenshot summary (Assistive Technologies course)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manuelgreindl1999/at-video-summary.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/manuelgreindl1999/at-video-summary/issues"
+  },
+  "homepage": "https://github.com/manuelgreindl1999/at-video-summary#readme",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}
