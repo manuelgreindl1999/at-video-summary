@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-
-const fetch = (...args) =>
-  import('node-fetch').then(({ default: fetch }) => fetch(...args));
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 async function describeFirstScreenshot() {
   const screenshotPath = path.join(__dirname, '..', 'screenshots', 'shot-001_1.png');
