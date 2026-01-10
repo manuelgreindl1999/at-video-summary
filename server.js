@@ -2,6 +2,8 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const ffmpeg = require('fluent-ffmpeg');
+const fs = require('fs');
+const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 const app = express();
 const port = 3000;
@@ -49,6 +51,33 @@ app.post('/upload', upload.single('video'), (req, res) => {
       folder: outputFolder,
       size: '640x?'
     });
+});
+
+// Test-Route: send one screenshot to LLaVA
+app.get('/describe-first-screenshot', async (req, res) => {
+  try {
+    const screenshotPath = path.join(__dirname, 'screenshots', 'shot-001_3.png');
+
+    const imageBuffer = fs.readFileSync(screenshotPath);
+    const imageBase64 = imageBuffer.toString('base64');
+
+    const response = await fetch('http://localhost:11434/api/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'llava',
+        prompt: 'Describe this video frame in a concise sentence.',
+        images: [imageBase64],
+        stream: false
+      })
+    });
+
+    const data = await response.json();
+    res.send(`<pre>${data.response}</pre>`);
+  } catch (err) {
+    console.error('Error calling LLaVA:', err);
+    res.status(500).send('Error calling LLaVA.');
+  }
 });
 
 app.listen(port, () => {
