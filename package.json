@@ -19,6 +19,8 @@
   },
   "homepage": "https://github.com/manuelgreindl1999/at-video-summary#readme",
   "dependencies": {
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "fluent-ffmpeg": "^2.1.3",
+    "multer": "^2.0.2"
   }
 }
