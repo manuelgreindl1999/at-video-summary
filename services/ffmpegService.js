@@ -10,6 +10,7 @@ async function createScreenshots(inputPath) {
         console.log('Screenshots created');
         // Wir wissen hier noch nicht genau, wie viele – fürs Erste
         // geben wir nur das Verzeichnis zurück.
+        // Hallo ich bin auch da
         resolve(outputFolder);
       })
       .on('error', (err) => {
