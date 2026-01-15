@@ -1,31 +1,42 @@
 const ffmpeg = require('fluent-ffmpeg');
 const path = require('path');
+const fs = require('fs');
 
-async function createScreenshots(inputPath) {
+async function createScreenshots(inputPath, intervalSec = 1) { //hier kann die Intervallzeit eingestellt werden
   const outputFolder = path.join(__dirname, '..', 'screenshots');
+  await fs.promises.mkdir(outputFolder, { recursive: true });
 
+  // 1. Videolänge
+  const duration = await new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(inputPath, (err, metadata) => {
+      if (err) return reject(err);
+      resolve(metadata.format.duration);
+    });
+  });
+
+  // 2. Timestamps 
+  const timestamps = [];
+  for (let t = 0; t < duration; t += intervalSec) {
+    const s = Math.floor(t % 60).toString().padStart(2, '0');
+    const m = Math.floor(t / 60).toString().padStart(2, '0');
+    timestamps.push(`00:${m}:${s}.000`);
+  }
+
+  // 3. Screenshots
   return new Promise((resolve, reject) => {
     ffmpeg(inputPath)
       .on('end', () => {
-        console.log('Screenshots created');
-        // Wir wissen hier noch nicht genau, wie viele – fürs Erste
-        // geben wir nur das Verzeichnis zurück.
-        // Hallo ich bin auch da
+        console.log(`Done! Created ${timestamps.length} screenshots.`);
         resolve(outputFolder);
       })
-      .on('error', (err) => {
-        console.error('FFmpeg-Error:', err);
-        reject(err);
-      })
+      .on('error', reject)
       .screenshots({
-        timestamps: ['00:00:01.000', '00:00:03.000', '00:00:05.000'],
-        filename: 'shot-%03d.png',
+        timestamps,
+        filename: 'shot-%04d.png',
         folder: outputFolder,
         size: '640x?'
       });
   });
 }
 
-module.exports = {
-  createScreenshots,
-};
+module.exports = { createScreenshots };
