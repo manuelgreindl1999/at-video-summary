@@ -13,7 +13,7 @@ async function describeFirstScreenshot() {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       model: 'llava',
-      prompt: 'Describe this video frame in a concise sentence.',
+      prompt: 'Describe what happens in this video frame very precisely. Explain what characters are on there and what they are doing',
       images: [imageBase64],
       stream: false,
     }),
