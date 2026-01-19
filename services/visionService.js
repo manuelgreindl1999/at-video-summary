@@ -14,6 +14,8 @@ async function describeFirstScreenshot() {
   const legacyPath = path.join(screenshotsDir, 'shot-001_1.png');
   let screenshotPath = null;
 
+
+// Organisiert die pngs im Screenshots Ordner (kommt zweimal vor?)
   if (fs.existsSync(legacyPath)) {
     screenshotPath = legacyPath;
   } else if (fs.existsSync(screenshotsDir)) {
@@ -39,9 +41,12 @@ async function describeFirstScreenshot() {
     throw new Error('No screenshot found to describe');
   }
 
+// Konvertiert das Bild in base64
   const imageBuffer = fs.readFileSync(screenshotPath);
   const imageBase64 = imageBuffer.toString('base64');
 
+
+// Ruft die lokale LLama API auf, um das Bild zu beschreiben
   const response = await fetch('http://localhost:11434/api/generate', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -65,6 +70,8 @@ module.exports = {
    * This calls the local LLama-like API once per image (sequentially).
    * @returns {Promise<string[]>}
    */
+  
+// Beschreibt alle Screenshots im Screenshots Ordner und gibt ein Array mit den Beschreibungen zurück
   async describeAllScreenshots() {
     const screenshotsDir = path.join(__dirname, '..', 'screenshots');
 

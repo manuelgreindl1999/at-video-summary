@@ -33,7 +33,7 @@ function cleanupScreenshots(screenshotsDir) {
     console.error('Error cleaning screenshots folder:', e);
   }
 }
-
+// Cleans up all files in the uploads directory
 function cleanupUploads(uploadsDir) {
   try {
     if (!fs.existsSync(uploadsDir)) return;
@@ -56,7 +56,7 @@ function cleanupUploads(uploadsDir) {
     console.error('Error cleaning uploads folder:', e);
   }
 }
-
+// Cleans up all description text files in the descriptions directory
 function cleanupDescriptions(descriptionsDir) {
   try {
     if (!fs.existsSync(descriptionsDir)) return;
