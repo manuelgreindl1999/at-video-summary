@@ -1,7 +1,7 @@
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
 /**
- * Summarize an array of descriptions into a concise paragraph using the local Ollama API.
+ * Fasst ein Beschreibungs-Array in einen prägnanten Absatz zusammen, indem die lokale Ollama-API verwendet wird.
  * @param {string[]} descriptions
  * @returns {Promise<string>} summary
  */
@@ -10,9 +10,9 @@ async function summarizeDescriptions(descriptions) {
     return '(no descriptions to summarize)';
   }
 
-  const prompt = `You are given multiple short descriptions of video frames, separated by "---".\n` +
+  const prompt = `You are given multiple short descriptions of video frames, separated by "---".\n` + 
     `Combine these into a concise 2-3 sentence summary of the overall scene and action. Be factual and neutral.\n\n` +
-    descriptions.map((d, i) => `Frame ${i + 1}: ${d}`).join('\n---\n');
+    descriptions.map((d, i) => `Frame ${i + 1}: ${d}`).join('\n---\n'); // Eingabeaufforderung
 
   try {
     const response = await fetch('http://localhost:11434/api/generate', {
@@ -28,10 +28,10 @@ async function summarizeDescriptions(descriptions) {
     const data = await response.json();
     if (data.response) return data.response;
     if (Array.isArray(data.responses) && data.responses.length > 0) return data.responses[0];
-    return '(no summary returned)';
+    return '(keine Zusammenfassung zurückgegeben)';
   } catch (err) {
-    console.error('Summarizer error:', err);
-    return `(error summarizing descriptions: ${err.message})`;
+    console.error('Zusammenfassungs-Fehler:', err);
+    return `(Fehler beim Zusammenfassen von Beschreibungen: ${err.message})`;
   }
 }
 

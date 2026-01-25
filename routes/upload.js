@@ -9,11 +9,11 @@ const { summarizeDescriptions } = require('../services/summarizerService');
 
 const router = express.Router();
 
-// Multer-Configuration (Upload-Destination)
+// Multer-Konfiguration (Upload-Ziel)
 const upload = multer({ dest: 'uploads/' });
 
-// Option to automatically clear screenshots after processing.
-// Enable by setting the environment variable CLEAN_SCREENSHOTS=true
+// Option zum automatischen Löschen von Screenshots nach der Verarbeitung.
+// Aktivierung durch Setzen der Umgebungsvariable CLEAN_SCREENSHOTS=true
 const CLEAN_SCREENSHOTS = 'true';
 
 function cleanupScreenshots(screenshotsDir) {
@@ -33,7 +33,7 @@ function cleanupScreenshots(screenshotsDir) {
     console.error('Error cleaning screenshots folder:', e);
   }
 }
-// Cleans up all files in the uploads directory
+// Löscht alle Dateien im Uploads-Verzeichnis
 function cleanupUploads(uploadsDir) {
   try {
     if (!fs.existsSync(uploadsDir)) return;
@@ -45,7 +45,7 @@ function cleanupUploads(uploadsDir) {
         if (stat.isFile()) {
           fs.unlinkSync(fullPath);
         } else if (stat.isDirectory()) {
-          // Recursively delete directories
+          // Rekursiv Verzeichnisse löschen
           fs.rmSync(fullPath, { recursive: true, force: true });
         }
       } catch (e) {
@@ -56,7 +56,7 @@ function cleanupUploads(uploadsDir) {
     console.error('Error cleaning uploads folder:', e);
   }
 }
-// Cleans up all description text files in the descriptions directory
+// Löscht alle Beschreibungs-Textdateien im Beschreibungs-Verzeichnis
 function cleanupDescriptions(descriptionsDir) {
   try {
     if (!fs.existsSync(descriptionsDir)) return;
@@ -83,10 +83,10 @@ router.post('/upload', upload.single('video'), async (req, res) => {
   try {
     await createScreenshots(inputPath);
 
-    // Describe all screenshots
+    // Alle Screenshots beschreiben
     const descriptions = await describeAllScreenshots();
 
-    // Ensure descriptions folder exists and save per-frame descriptions
+    // Sicherstellen, dass der descriptions Ordner existiert und per-frame descriptions speichern
     const descriptionsDir = path.join(__dirname, '..', 'descriptions');
     fs.mkdirSync(descriptionsDir, { recursive: true });
 
@@ -98,37 +98,37 @@ router.post('/upload', upload.single('video'), async (req, res) => {
         fs.writeFileSync(p, descriptions[i], 'utf8');
         savedFiles.push(p);
       } catch (e) {
-        console.error('Failed to save description', p, e);
+        console.error('Beschreibung konnte nicht gespeichert werden', p, e);
       }
     }
 
-    // Summarize all descriptions using the summarizer service
+    // Alle Beschreibungen mit dem summarizerService zusammenfassen
     const summary = await summarizeDescriptions(descriptions);
 
-    // Save the final summary as well
+    // Speichern der endgültigen Zusammenfassung
     const summaryPath = path.join(descriptionsDir, `summary-${Date.now()}.txt`);
     try {
       fs.writeFileSync(summaryPath, summary, 'utf8');
       savedFiles.push(summaryPath);
     } catch (e) {
-      console.error('Failed to save summary', summaryPath, e);
+      console.error('Zusammenfassung konnte nicht gespeichert werden', summaryPath, e);
     }
 
-    // Render results
+    // Ergebnisse rendern
     const listItems = descriptions.map((d, i) => `<li><strong>Frame ${i + 1}:</strong> ${d}</li>`).join('\n');
     res.send(`
-      <h1>Video summary</h1>
-      <h2>Concise summary</h2>
+      <h1>Video-Zusammenfassung</h1>
+      <h2>Kurze Zusammenfassung</h2>
       <p>${summary}</p>
-      <h2>Frame descriptions</h2>
+      <h2>Bildbeschreibungen</h2>
       <ul>
         ${listItems}
       </ul>
-      <a href="/">Back to upload</a>
+      <a href="/">Zurück zum Upload</a>
     `);
   } catch (err) {
-    console.error('Error during processing:', err);
-    res.status(500).send('Error during video processing.');
+    console.error('Fehler bei der Verarbeitung:', err);
+    res.status(500).send('Fehler bei der Videoverarbeitung.');
   } finally {
     if (CLEAN_SCREENSHOTS) {
       const screenshotsDir = path.join(__dirname, '..', 'screenshots');

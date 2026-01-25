@@ -2,81 +2,23 @@ const fs = require('fs');
 const path = require('path');
 const fetch = (...args) => import('node-fetch').then(({ default: fetch }) => fetch(...args));
 
-/**
- * Describe the first available screenshot. If the hardcoded file doesn't exist,
- * this searches for files matching shot-*.png (including variants with _n) and
- * uses the first one found.
- */
-async function describeFirstScreenshot() {
-  const screenshotsDir = path.join(__dirname, '..', 'screenshots');
-
-  // Prefer this legacy path if present
-  const legacyPath = path.join(screenshotsDir, 'shot-001_1.png');
-  let screenshotPath = null;
 
 
-// Organisiert die pngs im Screenshots Ordner (kommt zweimal vor?)
-  if (fs.existsSync(legacyPath)) {
-    screenshotPath = legacyPath;
-  } else if (fs.existsSync(screenshotsDir)) {
-    const files = fs.readdirSync(screenshotsDir)
-      .filter(f => /^shot-\d+(?:_\d+)?\.png$/.test(f))
-      .sort((a, b) => {
-        const ma = a.match(/^shot-(\d+)(?:_(\d+))?\.png$/);
-        const mb = b.match(/^shot-(\d+)(?:_(\d+))?\.png$/);
-        const na = ma ? parseInt(ma[1], 10) : 0;
-        const nb = mb ? parseInt(mb[1], 10) : 0;
-        if (na !== nb) return na - nb;
-        const sa = ma && ma[2] ? parseInt(ma[2], 10) : 0;
-        const sb = mb && mb[2] ? parseInt(mb[2], 10) : 0;
-        return sa - sb;
-      });
-
-    if (files.length > 0) {
-      screenshotPath = path.join(screenshotsDir, files[0]);
-    }
-  }
-
-  if (!screenshotPath) {
-    throw new Error('No screenshot found to describe');
-  }
-
-// Konvertiert das Bild in base64
-  const imageBuffer = fs.readFileSync(screenshotPath);
-  const imageBase64 = imageBuffer.toString('base64');
-
-
-// Ruft die lokale LLama API auf, um das Bild zu beschreiben
-  const response = await fetch('http://localhost:11434/api/generate', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      model: 'llava',
-      prompt: 'Describe what happens in this video frame very precisely. Explain what characters are on there and what they are doing',
-      images: [imageBase64],
-      stream: false,
-    }),
-  });
-
-  const data = await response.json();
-  return data.response || '(no response field)';
-}
 
 module.exports = {
-  describeFirstScreenshot,
+  
   /**
-   * Describe all screenshots found in screenshots/ and return an array of descriptions
-   * in the same order as the sorted filenames.
-   * This calls the local LLama-like API once per image (sequentially).
+   * Beschreibt alle Screenshots im Screenshots-Ordner und gibt ein Array mit Beschreibungen zurück
+   * in der gleichen Reihenfolge wie die sortierten Dateinamen.
+   * Dies ruft die lokale LLama-ähnliche API nacheinander einmal pro Bild auf.
    * @returns {Promise<string[]>}
    */
   
-// Beschreibt alle Screenshots im Screenshots Ordner und gibt ein Array mit den Beschreibungen zurück
   async describeAllScreenshots() {
     const screenshotsDir = path.join(__dirname, '..', 'screenshots');
 
     if (!fs.existsSync(screenshotsDir)) {
-      throw new Error('Screenshots directory does not exist');
+      throw new Error('Screenshots-Verzeichnis existiert nicht');
     }
 
     const files = fs.readdirSync(screenshotsDir)
@@ -93,12 +35,12 @@ module.exports = {
       });
 
     if (files.length === 0) {
-      throw new Error('No screenshots found to describe');
+      throw new Error('Keine Screenshots zum Beschreiben gefunden');
     }
 
     const descriptions = [];
 
-    // Describe sequentially to avoid overloading local API
+    // Nacheinander beschreiben um die lokale API nicht zu überlasten
     for (const f of files) {
       const p = path.join(screenshotsDir, f);
       const imageBuffer = fs.readFileSync(p);
@@ -117,10 +59,10 @@ module.exports = {
         });
 
         const data = await response.json();
-        const text = data.response || (Array.isArray(data.responses) && data.responses[0]) || '(no response)';
+        const text = data.response || (Array.isArray(data.responses) && data.responses[0]) || '(keine Antwort)';
         descriptions.push(text);
       } catch (err) {
-        descriptions.push(`(error describing ${f}: ${err.message})`);
+        descriptions.push(`(Fehler beim Beschreiben von ${f}: ${err.message})`);
       }
     }
 

@@ -7,8 +7,8 @@ async function createScreenshots(inputPath, intervalSec = 1) { //hier kann die I
   await fs.promises.mkdir(outputFolder, { recursive: true });
 
   // Temporär: feste Anzahl von Screenshots (3) verwenden.
-  // Die ursprüngliche Logik (ffprobe + for-loop) ist unten auskommentiert,
-  // damit sie leicht wiederhergestellt werden kann.
+  // Die ursprüngliche Logik (ffprobe + for-loop) unten auskommentieren um feste Timestamps zu verwenden,
+  
   /*
   // Beispielhafte feste Timestamps (1s, 3s, 5s) — genau 3 Screenshots.
   const timestamps = ['00:00:01.000', '00:00:03.000', '00:00:05.000'];
@@ -35,7 +35,7 @@ async function createScreenshots(inputPath, intervalSec = 1) { //hier kann die I
   return new Promise((resolve, reject) => {
     ffmpeg(inputPath)
       .on('end', () => {
-        console.log(`Done! Created ${timestamps.length} screenshots.`);
+        console.log(`Fertig! ${timestamps.length} Screenshots erstellt.`);
         resolve(outputFolder);
       })
       .on('error', reject)
