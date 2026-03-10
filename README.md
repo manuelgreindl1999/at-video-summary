@@ -17,16 +17,15 @@ Stelle außerdem sicher, dass der Ollama‑Server läuft (z. B. durch `ollama 
 
 1. Repository klonen (oder herunterladen).
 2. Im Projektordner die Abhängigkeiten installieren:
-   ```bash
-   npm install
+   `npm install`
 3. FFmpeg muss im System‑PATH verfügbar sein (Test im Terminal mit ffmpeg -version).
 4. In Ollama das gewünschte Vision‑Modell bereitstellen, z. B.:
-    ollama pull llava
+    `ollama pull llava`
 
 ## Starten der Anwendung
 
 1. Im Projektordner den Server starten:
-    node server.js
+    `node server.js`
 2. Im Browser die folgende Adresse aufrufen:
     http://localhost:3000
 3. Auf der Webseite ein Video auswählen und hochladen.
